@@ -1,0 +1,12 @@
+{
+  "name": "kraftelite-website",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.0.0",
+    "@portabletext/to-html": "^2.0.0"
+  }
+}
