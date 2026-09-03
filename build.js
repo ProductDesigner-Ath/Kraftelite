@@ -66,6 +66,68 @@ function updateListing(filePath, startMarker, endMarker, newContent) {
 }
 
 // ── BLOG POSTS ──────────────────────────────────────────────
+const CARD_ACCENTS = ['#1c1c2e','#1a1a3e','#0d1b2a','#1b2838','#12192c','#1f1b2e']
+
+function arrowBtn(outlined) {
+  const bg = outlined ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.3)'
+  return `<div style="width:42px;height:42px;border-radius:50%;background:${bg};backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.18)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+  </div>`
+}
+
+function blogCard(post, size) {
+  const coverUrl = imageUrl(post.coverRef)
+  const accentIdx = post.slug ? post.slug.charCodeAt(0) % CARD_ACCENTS.length : 0
+  const accent = CARD_ACCENTS[accentIdx]
+  const isLarge = size === 'large'
+  const colSpan = isLarge ? 'grid-column:span 2;' : ''
+  const minH = '320px'
+  const titleSize = isLarge ? '1.5rem' : '1.1rem'
+  const dateStr = formatDate(post.publishedAt)
+  const badge = dateStr ? `<span style="display:inline-block;background:rgba(255,255,255,0.13);backdrop-filter:blur(8px);color:rgba(255,255,255,0.8);font-size:0.68rem;padding:0.25rem 0.7rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase">${dateStr}</span>` : ''
+
+  if (coverUrl) {
+    return `<a href="blog/${post.slug}.html" style="${colSpan}position:relative;display:flex;flex-direction:column;justify-content:space-between;border-radius:20px;overflow:hidden;min-height:${minH};text-decoration:none;background:#111">
+      <img src="${coverUrl}" alt="${escapeHtml(post.title)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.78"/>
+      <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.72) 100%)"></div>
+      <div style="position:relative;padding:1.25rem">${badge}</div>
+      <div style="position:relative;padding:1.25rem;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem">
+        <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0;line-height:1.3">${escapeHtml(post.title)}</h3>
+        ${arrowBtn(true)}
+      </div>
+    </a>`
+  }
+
+  return `<a href="blog/${post.slug}.html" style="${colSpan}position:relative;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;min-height:${minH};text-decoration:none;background:${accent};padding:1.25rem;box-sizing:border-box">
+    <div>${badge}</div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-top:1.5rem">
+      <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0 0 ${post.excerpt ? '0.75rem' : '1.5rem'};line-height:1.3">${escapeHtml(post.title)}</h3>
+      ${post.excerpt ? `<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin:0 0 1.5rem;line-height:1.6">${escapeHtml(post.excerpt)}</p>` : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="color:rgba(255,255,255,0.4);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em">Read more</span>
+        ${arrowBtn(false)}
+      </div>
+    </div>
+  </a>`
+}
+
+function buildBentoGrid(posts) {
+  if (posts.length === 0) {
+    return `<div style="text-align:center;padding:6rem 0;opacity:0.35">
+      <p style="font-size:1rem;letter-spacing:0.05em;text-transform:uppercase">No posts yet — check back soon.</p>
+    </div>`
+  }
+  let html = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:2rem 0">`
+  if (posts[0]) html += blogCard(posts[0], 'normal')
+  if (posts[1]) html += blogCard(posts[1], 'large')
+  for (let i = 2; i <= 4 && i < posts.length; i++) html += blogCard(posts[i], 'normal')
+  if (posts[5]) html += blogCard(posts[5], 'large')
+  if (posts[6]) html += blogCard(posts[6], 'normal')
+  for (let i = 7; i < posts.length; i++) html += blogCard(posts[i], 'normal')
+  html += `</div>`
+  return html
+}
+
 async function buildBlog() {
   console.log('Fetching blog posts...')
   const posts = await client.fetch(`
@@ -95,21 +157,8 @@ async function buildBlog() {
     console.log(`  → blog/${post.slug}.html`)
   }
 
-  const cards = posts.length === 0
-    ? `<p style="opacity:0.5;text-align:center;padding:4rem 0">No posts yet — check back soon.</p>`
-    : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2rem;padding:3rem 0">
-        ${posts.map(post => {
-          const coverUrl = imageUrl(post.coverRef)
-          return `<a href="blog/${post.slug}.html" style="text-decoration:none;color:inherit;display:block">
-            ${coverUrl ? `<img src="${coverUrl}" alt="${escapeHtml(post.title)}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;margin-bottom:1rem"/>` : ''}
-            <div style="font-size:0.8rem;opacity:0.4;margin-bottom:0.5rem">${formatDate(post.publishedAt)}</div>
-            <h3 style="margin:0 0 0.5rem;font-size:1.25rem;font-weight:600">${escapeHtml(post.title)}</h3>
-            <p style="opacity:0.6;font-size:0.9rem;margin:0;line-height:1.6">${escapeHtml(post.excerpt || '')}</p>
-          </a>`
-        }).join('\n')}
-      </div>`
-
-  const blogSection = `<section class="u-section"><div class="w-layout-blockcontainer u-container w-container"><div style="padding:2rem 0">${cards}</div></div></section>`
+  const grid = buildBentoGrid(posts)
+  const blogSection = `<section class="u-section"><div class="w-layout-blockcontainer u-container w-container"><div style="padding:2rem 0">${grid}</div></div></section>`
   updateListing('blog.html', '<!-- CMS:BLOG-LISTING-START -->', '<!-- CMS:BLOG-LISTING-END -->', blogSection)
   console.log('  Updated blog.html listing')
 }
