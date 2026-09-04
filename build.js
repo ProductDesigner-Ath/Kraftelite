@@ -86,45 +86,45 @@ function blogCard(post, size) {
   const dateStr = formatDate(post.publishedAt)
   const badge = dateStr ? `<span style="display:inline-block;background:rgba(255,255,255,0.13);backdrop-filter:blur(8px);color:rgba(255,255,255,0.8);font-size:0.68rem;padding:0.25rem 0.7rem;border-radius:999px;letter-spacing:0.06em;text-transform:uppercase">${dateStr}</span>` : ''
 
+  const tagsAttr = (post.tags || []).join(',')
+
   if (coverUrl) {
-    return `<a href="blog/${post.slug}.html" style="${colSpan}position:relative;display:flex;flex-direction:column;justify-content:space-between;border-radius:20px;overflow:hidden;min-height:${minH};text-decoration:none;background:#111">
-      <img src="${coverUrl}" alt="${escapeHtml(post.title)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.78"/>
-      <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.72) 100%)"></div>
-      <div style="position:relative;padding:1.25rem">${badge}</div>
-      <div style="position:relative;padding:1.25rem;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem">
-        <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0;line-height:1.3">${escapeHtml(post.title)}</h3>
-        ${arrowBtn(true)}
-      </div>
-    </a>`
+    return `<div class="bc" data-tags="${tagsAttr}" data-title="${escapeHtml(post.title)}" data-excerpt="${escapeHtml(post.excerpt||'')}" data-date="${post.publishedAt||''}" data-size="${size}" style="${colSpan}">
+      <a href="blog/${post.slug}.html" style="position:relative;display:flex;flex-direction:column;justify-content:space-between;border-radius:20px;overflow:hidden;height:100%;min-height:${minH};text-decoration:none;background:#111">
+        <img src="${coverUrl}" alt="${escapeHtml(post.title)}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.78"/>
+        <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.72) 100%)"></div>
+        <div style="position:relative;padding:1.25rem">${badge}</div>
+        <div style="position:relative;padding:1.25rem;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem">
+          <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0;line-height:1.3">${escapeHtml(post.title)}</h3>
+          ${arrowBtn(true)}
+        </div>
+      </a>
+    </div>`
   }
 
-  return `<a href="blog/${post.slug}.html" style="${colSpan}position:relative;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;min-height:${minH};text-decoration:none;background:${accent};padding:1.25rem;box-sizing:border-box">
-    <div>${badge}</div>
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-top:1.5rem">
-      <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0 0 ${post.excerpt ? '0.75rem' : '1.5rem'};line-height:1.3">${escapeHtml(post.title)}</h3>
-      ${post.excerpt ? `<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin:0 0 1.5rem;line-height:1.6">${escapeHtml(post.excerpt)}</p>` : ''}
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="color:rgba(255,255,255,0.4);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em">Read more</span>
-        ${arrowBtn(false)}
+  return `<div class="bc" data-tags="${tagsAttr}" data-title="${escapeHtml(post.title)}" data-excerpt="${escapeHtml(post.excerpt||'')}" data-date="${post.publishedAt||''}" data-size="${size}" style="${colSpan}">
+    <a href="blog/${post.slug}.html" style="position:relative;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;height:100%;min-height:${minH};text-decoration:none;background:${accent};padding:1.25rem;box-sizing:border-box">
+      <div>${badge}</div>
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding-top:1.5rem">
+        <h3 style="color:#fff;font-size:${titleSize};font-weight:700;margin:0 0 ${post.excerpt ? '0.75rem' : '1.5rem'};line-height:1.3">${escapeHtml(post.title)}</h3>
+        ${post.excerpt ? `<p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin:0 0 1.5rem;line-height:1.6">${escapeHtml(post.excerpt)}</p>` : ''}
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="color:rgba(255,255,255,0.4);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em">Read more</span>
+          ${arrowBtn(false)}
+        </div>
       </div>
-    </div>
-  </a>`
+    </a>
+  </div>`
 }
 
 function buildBentoGrid(posts) {
-  if (posts.length === 0) {
-    return `<div style="text-align:center;padding:6rem 0;opacity:0.35">
-      <p style="font-size:1rem;letter-spacing:0.05em;text-transform:uppercase">No posts yet — check back soon.</p>
-    </div>`
-  }
-  let html = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:2rem 0">`
+  let html = ''
   if (posts[0]) html += blogCard(posts[0], 'normal')
   if (posts[1]) html += blogCard(posts[1], 'large')
   for (let i = 2; i <= 4 && i < posts.length; i++) html += blogCard(posts[i], 'normal')
   if (posts[5]) html += blogCard(posts[5], 'large')
   if (posts[6]) html += blogCard(posts[6], 'normal')
   for (let i = 7; i < posts.length; i++) html += blogCard(posts[i], 'normal')
-  html += `</div>`
   return html
 }
 
@@ -132,7 +132,7 @@ async function buildBlog() {
   console.log('Fetching blog posts...')
   const posts = await client.fetch(`
     *[_type == "blogPost"] | order(publishedAt desc) {
-      title, "slug": slug.current, publishedAt, excerpt,
+      title, "slug": slug.current, publishedAt, excerpt, tags,
       "coverRef": coverImage.asset._ref, body
     }
   `)
@@ -157,8 +157,87 @@ async function buildBlog() {
     console.log(`  → blog/${post.slug}.html`)
   }
 
-  const grid = buildBentoGrid(posts)
-  const blogSection = `<section class="u-section"><div class="w-layout-blockcontainer u-container w-container"><div style="padding:2rem 0">${grid}</div></div></section>`
+  const cardsHtml = buildBentoGrid(posts)
+  const emptyMsg = posts.length === 0
+    ? '<div id="blog-empty" style="text-align:center;padding:6rem 0;opacity:0.35"><p style="font-size:1rem;letter-spacing:0.05em;text-transform:uppercase">No posts yet — check back soon.</p></div>'
+    : '<div id="blog-empty" style="display:none;text-align:center;padding:6rem 0;opacity:0.35"><p style="font-size:1rem;letter-spacing:0.05em;text-transform:uppercase">No posts match your search.</p></div>'
+
+  const blogSection = `<style>
+.blog-tag{cursor:pointer;border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:0.45rem 1.2rem;font-size:0.82rem;font-family:inherit;color:rgba(255,255,255,0.55);background:transparent;transition:all 0.2s;white-space:nowrap;outline:none}
+.blog-tag:hover{border-color:rgba(255,255,255,0.5);color:#fff}
+.blog-tag.active{background:#fff;color:#000;border-color:#fff}
+#blog-search,#blog-sort{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-family:inherit;font-size:0.85rem;padding:0.5rem 1rem;outline:none;transition:border-color 0.2s}
+#blog-search:focus,#blog-sort:focus{border-color:rgba(255,255,255,0.35)}
+#blog-search::placeholder{color:rgba(255,255,255,0.3)}
+#blog-sort option{background:#1c1c2e;color:#fff}
+</style>
+<section class="u-section">
+  <div style="padding:2.5rem 80px 80px;max-width:1600px;margin:0 auto;box-sizing:border-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <button class="blog-tag active" data-tag="*">Everything</button>
+        <button class="blog-tag" data-tag="the-webflow">The Webflow</button>
+        <button class="blog-tag" data-tag="freelancing">Freelancing</button>
+        <button class="blog-tag" data-tag="our-development">Our Development</button>
+        <button class="blog-tag" data-tag="ai">AI</button>
+      </div>
+      <div style="display:flex;gap:0.65rem;align-items:center;flex-shrink:0">
+        <input id="blog-search" type="text" placeholder="Search posts..." style="width:220px"/>
+        <select id="blog-sort">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+        </select>
+      </div>
+    </div>
+    <div id="blog-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+      ${cardsHtml}
+    </div>
+    ${emptyMsg}
+  </div>
+</section>
+<script>
+(function(){
+  var activeTag='*',searchQ='',sortOrder='newest';
+  function go(){
+    var cards=Array.from(document.querySelectorAll('.bc'));
+    var q=searchQ.toLowerCase();
+    var filtered=activeTag!=='*'||q!=='';
+    var visible=[];
+    cards.forEach(function(c){
+      var tags=c.dataset.tags?c.dataset.tags.split(',').filter(Boolean):[];
+      var title=(c.dataset.title||'').toLowerCase();
+      var excerpt=(c.dataset.excerpt||'').toLowerCase();
+      var ok=(activeTag==='*'||tags.indexOf(activeTag)!==-1)&&(!q||title.indexOf(q)!==-1||excerpt.indexOf(q)!==-1);
+      c.style.display=ok?'':'none';
+      if(ok)visible.push(c);
+    });
+    document.getElementById('blog-empty').style.display=visible.length===0?'block':'none';
+    visible.forEach(function(c){
+      c.style.gridColumn=(!filtered&&c.dataset.size==='large')?'span 2':'';
+    });
+    visible.sort(function(a,b){
+      var da=a.dataset.date||'',db=b.dataset.date||'';
+      return sortOrder==='newest'?(db<da?-1:db>da?1:0):(da<db?-1:da>db?1:0);
+    });
+    var grid=document.getElementById('blog-grid');
+    visible.forEach(function(c){grid.appendChild(c);});
+  }
+  document.addEventListener('DOMContentLoaded',function(){
+    document.querySelectorAll('.blog-tag').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        document.querySelectorAll('.blog-tag').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        activeTag=btn.dataset.tag;
+        go();
+      });
+    });
+    var s=document.getElementById('blog-search');
+    if(s)s.addEventListener('input',function(e){searchQ=e.target.value;go();});
+    var d=document.getElementById('blog-sort');
+    if(d)d.addEventListener('change',function(e){sortOrder=e.target.value;go();});
+  });
+})();
+</script>`
   updateListing('blog.html', '<!-- CMS:BLOG-LISTING-START -->', '<!-- CMS:BLOG-LISTING-END -->', blogSection)
   console.log('  Updated blog.html listing')
 }

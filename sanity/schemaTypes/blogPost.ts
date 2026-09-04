@@ -36,6 +36,20 @@ export default defineType({
       rows: 3,
     }),
     defineField({
+      name: 'tags',
+      title: 'Tags',
+      type: 'array',
+      of: [{type: 'string'}],
+      options: {
+        list: [
+          {title: 'The Webflow', value: 'the-webflow'},
+          {title: 'Freelancing', value: 'freelancing'},
+          {title: 'Our Development', value: 'our-development'},
+          {title: 'AI', value: 'ai'},
+        ],
+      },
+    }),
+    defineField({
       name: 'body',
       title: 'Body',
       type: 'array',
