@@ -25,12 +25,13 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 }
 
-function imageUrl(ref) {
+function imageUrl(ref, width) {
   if (!ref) return ''
   const match = ref.match(/^image-(.+)-(\d+x\d+)-(\w+)$/)
   if (!match) return ''
   const [, id, dimensions, format] = match
-  return `https://cdn.sanity.io/images/${process.env.SANITY_PROJECT_ID}/production/${id}-${dimensions}.${format}`
+  const w = width || 800
+  return `https://cdn.sanity.io/images/${process.env.SANITY_PROJECT_ID}/production/${id}-${dimensions}.${format}?w=${w}&fm=webp&q=80&fit=max`
 }
 
 function renderSections(sections) {
@@ -76,7 +77,7 @@ function arrowBtn(outlined) {
 }
 
 function blogCard(post, size) {
-  const coverUrl = imageUrl(post.coverRef)
+  const coverUrl = imageUrl(post.coverRef, 600)
   const accentIdx = post.slug ? post.slug.charCodeAt(0) % CARD_ACCENTS.length : 0
   const accent = CARD_ACCENTS[accentIdx]
   const isLarge = size === 'large'
@@ -142,7 +143,7 @@ async function buildBlog() {
   fs.mkdirSync('blog', { recursive: true })
 
   for (const post of posts) {
-    const coverUrl = imageUrl(post.coverRef)
+    const coverUrl = imageUrl(post.coverRef, 1200)
     const coverTag = coverUrl
       ? `<img src="${coverUrl}" alt="${escapeHtml(post.title)}" loading="eager" style="width:100%;border-radius:12px;margin-bottom:2.5rem"/>`
       : ''
@@ -256,7 +257,7 @@ async function buildProjects() {
   const template = fs.readFileSync('_templates/project.html', 'utf8')
 
   for (const project of projects) {
-    const coverUrl = imageUrl(project.coverRef)
+    const coverUrl = imageUrl(project.coverRef, 1200)
     const sectionsHtml = renderSections(project.sections)
     const content = `
       <div style="max-width:900px;margin:0 auto;padding:4rem 0">
@@ -278,7 +279,7 @@ async function buildProjects() {
   }
 
   const cards = projects.map(project => {
-    const coverUrl = imageUrl(project.coverRef)
+    const coverUrl = imageUrl(project.coverRef, 1200)
     return `<div item-style="" role="listitem" class="work_item w-dyn-item">
       <a href="projects/${project.slug}.html" class="project-card square w-inline-block">
         <div class="project-card-image-wrapper square-2">
@@ -318,7 +319,7 @@ async function buildServices() {
   const template = fs.readFileSync('_templates/service.html', 'utf8')
 
   for (const svc of services) {
-    const heroUrl = imageUrl(svc.heroRef)
+    const heroUrl = imageUrl(svc.heroRef, 1200)
     const sectionsHtml = renderSections(svc.sections)
     const featuresHtml = svc.features && svc.features.length
       ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin:3rem 0">
@@ -357,6 +358,7 @@ async function main() {
   await buildBlog()
   await buildProjects()
   await buildServices()
+  require('./optimize.js')
   console.log('\n✓ Build complete')
 }
 
