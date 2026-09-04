@@ -35,6 +35,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/ProductDesigner-Ath/Kraftelite.git
-          git add blog/ projects/ services/ blog.html projects.html
+          git add blog/ projects/ services/ blog.html projects.html index.html bookmeeting.html pricing.html t-c.html
           git diff --staged --quiet || git commit -m "chore: rebuild CMS content [skip ci]"
           git push

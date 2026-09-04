@@ -303,6 +303,16 @@ async function buildProjects() {
   const listingHtml = `<div fs-list-element="list" class="work_wrapper w-dyn-list"><div role="list" class="work_list-2 w-dyn-items">${cards}</div></div>`
   updateListing('projects.html', '<!-- CMS:PROJECTS-LISTING-START -->', '<!-- CMS:PROJECTS-LISTING-END -->', listingHtml)
   console.log('  Updated projects.html listing')
+
+  // Update homepage gallery — only when Sanity has projects so static fallback stays intact
+  if (projects.length > 0) {
+    const galleryItems = projects.map(project => {
+      const coverUrl = imageUrl(project.coverRef, 1200)
+      return `<div role="listitem" class="pg-cms-item w-dyn-item"><div data-slug="" data-link="projects/${project.slug}.html" data-title="${escapeHtml(project.title)}" data-tag="${escapeHtml(project.category || '')}" class="pg-cms-item">${coverUrl ? `<img src="${coverUrl}" loading="lazy" alt="${escapeHtml(project.title)}"/>` : ''}</div></div>`
+    }).join('')
+    updateListing('index.html', '<!-- CMS:HOMEPAGE-PROJECTS-START -->', '<!-- CMS:HOMEPAGE-PROJECTS-END -->', galleryItems)
+    console.log('  Updated index.html homepage gallery')
+  }
 }
 
 // ── SERVICES ────────────────────────────────────────────────
