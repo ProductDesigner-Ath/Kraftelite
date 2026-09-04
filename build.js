@@ -163,16 +163,16 @@ async function buildBlog() {
     : '<div id="blog-empty" style="display:none;text-align:center;padding:6rem 0;opacity:0.35"><p style="font-size:1rem;letter-spacing:0.05em;text-transform:uppercase">No posts match your search.</p></div>'
 
   const blogSection = `<style>
-.blog-tag{cursor:pointer;border:1px solid rgba(255,255,255,0.2);border-radius:999px;padding:0.45rem 1.2rem;font-size:0.82rem;font-family:inherit;color:rgba(255,255,255,0.55);background:transparent;transition:all 0.2s;white-space:nowrap;outline:none}
-.blog-tag:hover{border-color:rgba(255,255,255,0.5);color:#fff}
-.blog-tag.active{background:#fff;color:#000;border-color:#fff}
-#blog-search,#blog-sort{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-family:inherit;font-size:0.85rem;padding:0.5rem 1rem;outline:none;transition:border-color 0.2s}
-#blog-search:focus,#blog-sort:focus{border-color:rgba(255,255,255,0.35)}
-#blog-search::placeholder{color:rgba(255,255,255,0.3)}
-#blog-sort option{background:#1c1c2e;color:#fff}
+.blog-tag{cursor:pointer;border:1px solid rgba(0,0,0,0.2);border-radius:999px;padding:0.45rem 1.2rem;font-size:0.82rem;font-family:inherit;color:rgba(0,0,0,0.6);background:transparent;transition:all 0.2s;white-space:nowrap;outline:none}
+.blog-tag:hover{border-color:rgba(0,0,0,0.5);color:#000}
+.blog-tag.active{background:#000;color:#fff;border-color:#000}
+#blog-search,#blog-sort{background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.18);border-radius:10px;color:#111;font-family:inherit;font-size:0.85rem;padding:0.5rem 1rem;outline:none;transition:border-color 0.2s}
+#blog-search:focus,#blog-sort:focus{border-color:rgba(0,0,0,0.45)}
+#blog-search::placeholder{color:rgba(0,0,0,0.35)}
+#blog-sort option{background:#fff;color:#111}
 </style>
 <section class="u-section">
-  <div style="padding:2.5rem 80px 80px;max-width:1600px;margin:0 auto;box-sizing:border-box">
+  <div style="padding:120px 80px 80px;max-width:1600px;margin:0 auto;box-sizing:border-box">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:2.5rem;flex-wrap:wrap">
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
         <button class="blog-tag active" data-tag="*">Everything</button>
