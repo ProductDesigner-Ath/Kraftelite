@@ -304,14 +304,26 @@ async function buildProjects() {
   updateListing('projects.html', '<!-- CMS:PROJECTS-LISTING-START -->', '<!-- CMS:PROJECTS-LISTING-END -->', listingHtml)
   console.log('  Updated projects.html listing')
 
-  // Update homepage gallery — only when Sanity has projects so static fallback stays intact
-  if (projects.length > 0) {
-    const galleryItems = projects.map(project => {
+  // Update homepage gallery via window.__KE_PROJECTS — bypasses Webflow CMS JS interference
+  {
+    const keProjects = projects.map(project => {
       const coverUrl = imageUrl(project.coverRef, 1200)
-      return `<div role="listitem" class="pg-cms-item w-dyn-item"><div data-slug="" data-link="projects/${project.slug}.html" data-title="${escapeHtml(project.title)}" data-tag="${escapeHtml(project.category || '')}" class="pg-cms-item">${coverUrl ? `<img src="${coverUrl}" loading="lazy" alt="${escapeHtml(project.title)}"/>` : ''}</div></div>`
-    }).join('')
-    updateListing('index.html', '<!-- CMS:HOMEPAGE-PROJECTS-START -->', '<!-- CMS:HOMEPAGE-PROJECTS-END -->', galleryItems)
-    console.log('  Updated index.html homepage gallery')
+      return `{img:${JSON.stringify(coverUrl || '')},title:${JSON.stringify(project.title)},slug:'',link:${JSON.stringify('projects/' + project.slug + '.html')}}`
+    })
+
+    const dataScript = projects.length > 0
+      ? `<script id="ke-projects-data">window.__KE_PROJECTS=[${keProjects.join(',')}];</script>`
+      : `<script id="ke-projects-data">window.__KE_PROJECTS=[];</script>`
+
+    let indexHtml = fs.readFileSync('index.html', 'utf8')
+    if (indexHtml.includes('<script id="ke-projects-data">')) {
+      indexHtml = indexHtml.replace(/<script id="ke-projects-data">[\s\S]*?<\/script>/, dataScript)
+    } else {
+      // Insert before the gallery IIFE script
+      indexHtml = indexHtml.replace('<script>\n(function(){\n\n  var FOLDER_IMG', `${dataScript}\n<script>\n(function(){\n\n  var FOLDER_IMG`)
+    }
+    fs.writeFileSync('index.html', indexHtml)
+    console.log(`  Updated index.html gallery data (${projects.length} projects)`)
   }
 }
 
